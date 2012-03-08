@@ -13,7 +13,7 @@ TORRENTS_INFO = {
         'tracker_url': 'http://jip.cs.vu.nl:6969/announce',
         'creation_date': 1147934820,
         'client_name': None,         
-        'file_details': (), # Tuple of tuples containing (['path','of','file'], 'length', 'checksum') for each file in torrent
+        'file_details': ('Elephants_Dream_1024.avi', 445866736, ), # Tuple of tuples containing (['path','of','file'], 'length', 'checksum') for each file in torrent
     },
                  
     'Honest Man- The Life of R. Budd Dwyer (720p).torrent': {

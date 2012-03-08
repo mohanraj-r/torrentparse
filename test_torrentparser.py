@@ -12,7 +12,7 @@ from datetime import datetime
 import unittest
 
 from torrentparser import TorrentParser
-from test_data.torrents_info import TORRENTS_INFO
+from test_data.data_torrents_info import TORRENTS_INFO
 
 class TestTorrentParse(unittest.TestCase):
 
@@ -58,8 +58,6 @@ class TestTorrentParse(unittest.TestCase):
         ''' Test getting the name, length and checksum of the files inside a valid torrent file. '''
         for torrent_file in TORRENTS_INFO:
             tp = TorrentParser('test_data/%s' % torrent_file)
-            if not tp.get_files_details():
-                self.assertIsNone(TORRENTS_INFO[torrent_file]['file_details'])
             self.assertItemsEqual(tp.get_files_details(), TORRENTS_INFO[torrent_file]['file_details']) 
 
 if __name__ == "__main__":    

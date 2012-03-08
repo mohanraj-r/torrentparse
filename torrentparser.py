@@ -12,10 +12,12 @@ Created on 2012-03-07
 
 @author: mohanr
 '''
+
 from datetime import datetime
 import os
 import re
 import types
+
 
 class TorrentParser(object):
     '''
@@ -42,13 +44,8 @@ class TorrentParser(object):
             raise IOError("No file found at '%s'" % torrent_file_path)
         
         self.torrent_file = open(torrent_file_path, 'r')
-        self.torrent_content = self.torrent_file.read()
-        
-    
-    def __str__(self):
-        #TODO
-        pass
-    
+        self.torrent_content = self.torrent_file.read()         
+  
     
     def get_tracker_url(self):
         ''' Parses torrent file and returns the tracker URL '''
@@ -56,6 +53,7 @@ class TorrentParser(object):
         tracker_url_len = int(match[0])
         self.torrent_file.seek(len('d8:announce%d:' %tracker_url_len))
         return self.torrent_file.read(tracker_url_len)
+
     
     def get_creation_date(self):
         ''' Parses torrent file and returns creation date of the torrent, if present, in ISO format '''
@@ -78,14 +76,32 @@ class TorrentParser(object):
         if match:
             match_dict = match.groupdict()
             assert len(match_dict) == 1, 'Something is amiss. More than one client name found in torrent file.'
-            client_name_len = match_dict['client_len']            
+            client_name_len = int(match_dict['client_len'])            
             self.torrent_file.seek(match.end())
             client_name = self.torrent_file.read(client_name_len)
         
         return client_name
+
     
     def get_files_details(self):
-        pass
+        ''' Parses torrent file and returns details of the files contained in the torrent. 
+            Details include name, length and checksum for each file in the torrent.
+        '''
+        # Pattern to match file information in Single file torrents
+        match = re.search('4:infod6:lengthi(?P<file_length>[0-9]+)e4:name(?P<file_name_len>[0-9]+):', self.torrent_content)
+        file_name = file_length = None
+        file_details = ()
+        
+        if match:
+            match_dict = match.groupdict()
+            assert len(match_dict) == 2, 'Unable to match torrent file details inside torrent file.'
+            file_name_len = int(match_dict['file_name_len'])
+            self.torrent_file.seek(match.end())
+            file_name = self.torrent_file.read(file_name_len)
+            file_length = int(match_dict['file_name_len'])
+            file_details = (file_name, file_length, ) 
+            
+        return file_details
     
     def _parse_int(self):
         pass
