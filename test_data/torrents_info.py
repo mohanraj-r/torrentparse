@@ -1,6 +1,8 @@
 '''
 Contains information about the torrents in this directory. Used in testing.
 
+Created with the help of BEncode Editor found at http://forum.utorrent.com/viewtopic.php?id=31306 
+
 Created on 2012-03-07
 
 @author: mohanr

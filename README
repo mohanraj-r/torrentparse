@@ -1,0 +1,7 @@
+This package contains a module to parse a torrent file and provides methods to access certain attributes such as tracker url, creation date ..etc.
+
+Resources used to understand Torrent file structure:
+1. http://fileformats.wikia.com/wiki/Torrent_file
+2. http://wiki.theory.org/BitTorrentSpecification
+3. http://en.wikipedia.org/wiki/Bencode
+4. http://en.wikipedia.org/wiki/Torrent_file
