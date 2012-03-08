@@ -15,6 +15,7 @@ TORRENTS_INFO = {
         'client_name': None,         
         'file_details': (), # Tuple of tuples containing (['path','of','file'], 'length', 'checksum') for each file in torrent
     },
+                 
     'Honest Man- The Life of R. Budd Dwyer (720p).torrent': {
         'tracker_url': 'http://tracker.vodo.net:6970/announce',
         'creation_date': 1327345573,
@@ -24,5 +25,16 @@ TORRENTS_INFO = {
                          ('Show.your.support.now!.URL', 137,),
                          ('vodo.nfo', 6142,),
                          ),                                                                     
-    },                
+    },
+
+    'Megan Lisa Jones - Captive BitTorrent Edition.torrent': { 
+        'tracker_url': 'http://tracker001.clearbits.net:7070/announce',
+        'creation_date': 1301590654,
+        'client_name': 'mktorrent 1.0',         
+        'file_details': (('Captive by Megan Lisa Jones - Bittorrent Edition.pdf', 3075568,),
+                         ('Description.txt', 1872, ),
+                         ('Introduction to Captive by Megan Lisa Jones - BitTorrent Edition.mov', 219561953,),
+                         ('License.txt', 142, ),
+                         ),
+    },
 }

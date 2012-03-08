@@ -12,7 +12,7 @@ Created on 2012-03-07
 
 @author: mohanr
 '''
-
+from datetime import datetime
 import os
 import re
 import types
@@ -41,7 +41,8 @@ class TorrentParser(object):
         if not os.path.exists(torrent_file_path):
             raise IOError("No file found at '%s'" % torrent_file_path)
         
-        self.torrent_content = open(torrent_file_path, 'r').read()
+        self.torrent_file = open(torrent_file_path, 'r')
+        self.torrent_content = self.torrent_file.read()
         
     
     def __str__(self):
@@ -50,23 +51,38 @@ class TorrentParser(object):
     
     
     def get_tracker_url(self):
-        ''' Parses torrent content and returns the tracker URL '''
-        pass
-    
+        ''' Parses torrent file and returns the tracker URL '''
+        match = re.findall('d8:announce(?P<tracker_len>[0-9]+):', self.torrent_content)
+        tracker_url_len = int(match[0])
+        self.torrent_file.seek(len('d8:announce%d:' %tracker_url_len))
+        return self.torrent_file.read(tracker_url_len)
     
     def get_creation_date(self):
-        ''' Parses torrent content and returns creation date of the torrent'''
+        ''' Parses torrent file and returns creation date of the torrent, if present, in ISO format '''
         match = re.findall('13:creation datei(?P<creation_date>[0-9]+)e', self.torrent_content)
-        if not match:   
-            return None
-        else:
-            assert len(match) == 1, 'Something is amiss. Multiple creation dates found in torrent file.'
-            return int(match[0])        
-    
+        creation_date = None
+        
+        if match:
+            assert len(match) == 1, 'Something is amiss. More than one creation date found in torrent file.'
+            creation_date = datetime.utcfromtimestamp(int(match[0]))
+            creation_date = creation_date.isoformat()
+        
+        return creation_date         
+            
     
     def get_client_name(self):
-        pass
-    
+        ''' Parses torrent file and returns the name of the client that created the torrent if present '''
+        match = re.search('10:created by(?P<client_len>[0-9]+):', self.torrent_content)
+        client_name = None
+        
+        if match:
+            match_dict = match.groupdict()
+            assert len(match_dict) == 1, 'Something is amiss. More than one client name found in torrent file.'
+            client_name_len = match_dict['client_len']            
+            self.torrent_file.seek(match.end())
+            client_name = self.torrent_file.read(client_name_len)
+        
+        return client_name
     
     def get_files_details(self):
         pass

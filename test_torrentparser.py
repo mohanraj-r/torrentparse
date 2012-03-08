@@ -8,6 +8,7 @@ TODOs:
     . Use of for loops inside test cases seems smelly. Investigate and fix.
 
 '''
+from datetime import datetime
 import unittest
 
 from torrentparser import TorrentParser
@@ -44,7 +45,8 @@ class TestTorrentParse(unittest.TestCase):
         ''' Test getting creation date from a valid torrent file. ''' 
         for torrent_file in TORRENTS_INFO:
             tp = TorrentParser('test_data/%s' % torrent_file)
-            self.assertEqual(tp.get_creation_date(), TORRENTS_INFO[torrent_file]['creation_date'])
+            self.assertEqual(tp.get_creation_date(), 
+                             datetime.utcfromtimestamp(TORRENTS_INFO[torrent_file]['creation_date']).isoformat())
 
     def test_get_client_name(self):
         ''' Test getting Client name from a valid torrent file. '''          
