@@ -15,15 +15,12 @@ from torrentparser import TorrentParser
 from test_data.data_torrents_info import TORRENTS_INFO
 
 class TestTorrentParse(unittest.TestCase):
-
-
-    def setUp(self):
-        pass
-
-
-    def tearDown(self):
-        pass
-
+    ''' Unit tests for TorrentParser. Uses meta-data stored in data_torrents_info in data director to verify.
+     
+        TODO:
+            . Handle file path with multiple strings, due to difference in the format returned by the api 
+                (joined by os.path.sep) and the format in the data file (as separate strings).    
+    '''
 
     def test_parsercreation_invalidtype_file_input(self):
         ''' Test invalid inputs while creating parser object. '''
@@ -56,9 +53,10 @@ class TestTorrentParse(unittest.TestCase):
 
     def test_get_files_details(self):
         ''' Test getting the name, length and checksum of the files inside a valid torrent file. '''
+        import os
         for torrent_file in TORRENTS_INFO:
             tp = TorrentParser('test_data/%s' % torrent_file)
-            self.assertItemsEqual(tp.get_files_details(), TORRENTS_INFO[torrent_file]['file_details']) 
+            self.assertItemsEqual(tp.get_files_details(), TORRENTS_INFO[torrent_file]['file_details'])
 
 if __name__ == "__main__":    
     unittest.main()

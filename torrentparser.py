@@ -148,64 +148,41 @@ class TorrentParser(object):
         self.torrent_content = self.torrent_file.read()
         self.torrent_str = self._TorrentStr(self.torrent_content)
         
-        self.parsed_content = ""
+        self.parsed_content = self._parse_torrent()
   
     
     def get_tracker_url(self):
-        ''' Parses torrent file and returns the tracker URL '''
-        match = re.findall('d8:announce(?P<tracker_len>[0-9]+):', self.torrent_content)
-        tracker_url_len = int(match[0])
-        self.torrent_file.seek(len('d8:announce%d:' %tracker_url_len))
-        return self.torrent_file.read(tracker_url_len)
+        ''' Returns the tracker URL from the parsed torrent file. '''        
+        return self.parsed_content.get('announce')
 
     
     def get_creation_date(self):
-        ''' Parses torrent file and returns creation date of the torrent, if present, in ISO format '''
-        match = re.findall('13:creation datei(?P<creation_date>[0-9]+)e', self.torrent_content)
-        creation_date = None
-        
-        if match:
-            assert len(match) == 1, 'Something is amiss. More than one creation date found in torrent file.'
-            creation_date = datetime.utcfromtimestamp(int(match[0]))
-            creation_date = creation_date.isoformat()
-        
-        return creation_date         
+        ''' Returns creation date of the torrent, if present, in ISO format from the parsed torrent file. '''
+        time_stamp = self.parsed_content.get('creation date')
+        if time_stamp:
+            return datetime.utcfromtimestamp(time_stamp).isoformat()         
             
     
     def get_client_name(self):
-        ''' Parses torrent file and returns the name of the client that created the torrent if present '''
-        match = re.search('10:created by(?P<client_len>[0-9]+):', self.torrent_content)
-        client_name = None
-        
-        if match:
-            match_dict = match.groupdict()
-            assert len(match_dict) == 1, 'Something is amiss. More than one client name found in torrent file.'
-            client_name_len = int(match_dict['client_len'])            
-            self.torrent_file.seek(match.end())
-            client_name = self.torrent_file.read(client_name_len)
-        
-        return client_name
+        ''' Returns the name of the client that created the torrent if present, from the parsed torrent file. '''
+        return self.parsed_content.get('created by')
 
     
     def get_files_details(self):
         ''' Parses torrent file and returns details of the files contained in the torrent. 
             Details include name, length and checksum for each file in the torrent.
         '''
-        # Pattern to match file information in Single file torrents
-        match = re.search('4:infod6:lengthi(?P<file_length>[0-9]+)e4:name(?P<file_name_len>[0-9]+):', self.torrent_content)
-        file_name = file_length = None
-        file_details = ()
-        
-        if match:
-            match_dict = match.groupdict()
-            assert len(match_dict) == 2, 'Unable to match torrent file details inside torrent file.'
-            file_name_len = int(match_dict['file_name_len'])
-            self.torrent_file.seek(match.end())
-            file_name = self.torrent_file.read(file_name_len)
-            file_length = int(match_dict['file_name_len'])
-            file_details = (file_name, file_length, ) 
+        parsed_files_info = []
+        files_info = self.parsed_content.get('info')
+        if files_info: # 'info' should be present in all torrent files. Nevertheless.. 
+            multiple_files_info = files_info.get('files')
+            if multiple_files_info: # multiple-file torrent
+                for file_info in multiple_files_info:
+                    parsed_files_info.append((os.path.sep.join(file_info.get('path')), file_info.get('length'), ))
+            else: # single file torrent
+                parsed_files_info.append((files_info.get('name'), files_info.get('length'), ))
             
-        return file_details            
+        return parsed_files_info            
     
     
     def _parse_torrent(self):
@@ -252,14 +229,15 @@ class TorrentParser(object):
             return parsed_list                
         
         
-if __name__ == '__main__':
+if __name__ == '__main__': #eventhough this is intended to be a library, this is helpful when debugging
         
     test_files = ['test_data/Elephants Dream (avi) (1024x576).torrent', # single file torrent
                   'test_data/Megan Lisa Jones - Captive BitTorrent Edition.torrent', # multi-file torrent
                   'test_data/paz - young broke and fameless_ the mixtape.torrent', # multi-file torrent
+                  'test_data/Honest Man- The Life of R. Budd Dwyer (720p).torrent', #muti-file torrent
                   ]
     
     for test_file in test_files:
         tp = TorrentParser(test_file)
-        print tp._parse_torrent()
+        print tp.get_tracker_url(), tp.get_creation_date(), tp.get_client_name(), tp.get_files_details()
         print '*' * 80           
