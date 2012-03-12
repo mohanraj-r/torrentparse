@@ -44,7 +44,11 @@ class TorrentParser(object):
     INT_START = 'i'    
     
     class _TorrentStr(object):
-        ''' StringIO wrapper over the torrent string. '''
+        ''' StringIO wrapper over the torrent string. 
+        
+            TODO:
+                . Create unittests to cover this class.
+        '''
         
         STR_LEN_VALUE_SEP = ':'
         INT_END = 'e'    
@@ -59,16 +63,19 @@ class TorrentParser(object):
         
         def step_back(self, position=-1, mode=1):
             ''' Step back, by default, 1 position relative to the current position. '''
-            self.torr_str.seek(-1, 1) 
+            self.torr_str.seek(position, mode) 
         
         def parse_str(self):
             ''' Parse and return a string from the torrent file content. Format <string length>:<string>
             
+                Returns:
+                    Parsed string (from the current position).
+                Raises:
+                    ParsingError, when expected string format is not encountered.
+            
                 TODO: 
                     . Explore using regex to accomplish the parsing.            
-            '''
-#            self.step_back() # since the first digit of the str length would have been already consumed at this point
-                        
+            '''                       
             str_len = ''
             while True:
                 str_len_char = self.next_char()
@@ -83,10 +90,16 @@ class TorrentParser(object):
             if not str_len:
                 raise ParsingError('Empty string length found while parsing at position %d' % self.torr_str.pos)
             
-            return '"' + self.torr_str.read(int(str_len)) + '"'        
+            return self.torr_str.read(int(str_len))        
             
         def parse_int(self):
             ''' Parse and return an integer from the torrent file content. Format i[0-9]+e
+
+                Returns:
+                    Parsed integer (from the current position).
+                Raises:
+                    ParsingError, when expected integer format is not encountered.
+
             
                 TODO: 
                     . Explore using regex to accomplish the parsing.
@@ -200,13 +213,7 @@ class TorrentParser(object):
         
             Returns:
                 A dictionary containing info parsed from torrent file.
-        
-            TOFIX:
-                . The parsing works fine for single file torrents. Multi-file torrents have some problems. FIX.
-                . Dict values contain None at times. Shouldn't happen for valid torrent files. FIX.
-                . The parsed dict is inside a string. eval(string) throws an error. 
-                  Probably due to the hash values (their encoding). Invesitage and FIX.
-                        
+                                
         '''
         parsed_char = self.torrent_str.next_char()
         
@@ -224,40 +231,35 @@ class TorrentParser(object):
             return self.torrent_str.parse_str()
         
         elif parsed_char == self.DICT_START:
-            self.parsed_content += '{' 
+            parsed_dict = {}
             while True:
                 dict_key = self._parse_torrent()
                 if not dict_key: 
-                    break # End of dict
-                self.parsed_content += dict_key + self.DICT_KEY_VALUE_SEP
+                    break # End of dict                
                 dict_value = self._parse_torrent() # parse value
-#                if dict_value: #DEBUG 
-#                    continue
-                self.parsed_content += '%s %s' % (dict_value, self.DICT_LIST_ITEM_SEP) #%s coercion needed since key values can be any value. so + concatenation could fail.               
+                parsed_dict.setdefault(dict_key, dict_value)               
             
-            self.parsed_content += '}, '
-            return        
+            return parsed_dict        
         
         elif parsed_char == self.LIST_START:
-            self.parsed_content += '['
+            parsed_list=[]
             while True:
                 list_item = self._parse_torrent()
                 if not list_item: 
                     break # End of list  
-                self.parsed_content +=  list_item + self.DICT_LIST_ITEM_SEP
+                parsed_list.append(list_item)
             
-            self.parsed_content += '], '
-            return                
+            return parsed_list                
         
-        #return eval(self.parsed_content) # DEBUG - Throws an error
-        return self.parsed_content 
         
 if __name__ == '__main__':
-    
+        
     test_files = ['test_data/Elephants Dream (avi) (1024x576).torrent', # single file torrent
                   'test_data/Megan Lisa Jones - Captive BitTorrent Edition.torrent', # multi-file torrent
                   'test_data/paz - young broke and fameless_ the mixtape.torrent', # multi-file torrent
                   ]
+    
     for test_file in test_files:
         tp = TorrentParser(test_file)
-        print tp._parse_torrent()           
+        print tp._parse_torrent()
+        print '*' * 80           
