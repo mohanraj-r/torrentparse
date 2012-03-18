@@ -1,6 +1,6 @@
 What
 ====
-Parse a torrent file and provide methods to access the following attributes 
+Parse a torrent file in Python without using any 3rd party libraries and provide methods to access the following attributes 
 * tracker url, 
 * creation date,
 * name of the client that created the torrent, and
@@ -22,10 +22,10 @@ Resources that I used to understand Torrent file structure:
 Example
 =======
 The following stream of characters in the torrent file
-"d8:announce33:http://jip.cs.vu.nl:6969/announce13:creation datei1147934820e4:infod6:lengthi445866736e4:name24:Elephants_Dream_1024.avi12:piece lengthi262144e6:pieces34020:"
+> "d8:announce33:http://jip.cs.vu.nl:6969/announce13:creation datei1147934820e4:infod6:lengthi445866736e4:name24:Elephants_Dream_1024.avi12:piece lengthi262144e6:pieces34020:"
 
 is transformed into
-{'creation date': 1147934820, 'announce': 'http://jip.cs.vu.nl:6969/announce', 'info': {'length': 44
+> {'creation date': 1147934820, 'announce': 'http://jip.cs.vu.nl:6969/announce', 'info': {'length': 44
 5866736, 'piece length': 262144, 'name': 'Elephants_Dream_1024.avi', 'pieces':
 
 Existing implementations
