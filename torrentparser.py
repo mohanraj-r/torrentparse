@@ -16,7 +16,6 @@ Created on 2012-03-07
 from datetime import datetime
 from StringIO import StringIO
 import os
-import re
 import string
 import types
 
@@ -48,6 +47,7 @@ class TorrentParser(object):
         
             TODO:
                 . Create unittests to cover this class.
+                . Should this rather extend StringIO class. Explore.
         '''
         
         STR_LEN_VALUE_SEP = ':'
@@ -75,22 +75,13 @@ class TorrentParser(object):
             
                 TODO: 
                     . Explore using regex to accomplish the parsing.            
-            '''                       
-            str_len = ''
-            while True:
-                str_len_char = self.next_char()
-                if str_len_char not in string.digits:
-                    if str_len_char != self.STR_LEN_VALUE_SEP:
-                        raise ParsingError('Invalid character %s found after parsing string length (%s expected) at position %d.' % 
-                                           (str_len_char, self.STR_LEN_VALUE_SEP, self.torr_str.pos))                     
-                    break
-                
-                str_len += str_len_char 
+            '''                                   
+            str_len = self._parse_number(delimiter=self.STR_LEN_VALUE_SEP)
             
             if not str_len:
                 raise ParsingError('Empty string length found while parsing at position %d' % self.torr_str.pos)
             
-            return self.torr_str.read(int(str_len))        
+            return self.torr_str.read(str_len)        
             
         def parse_int(self):
             ''' Parse and return an integer from the torrent file content. Format i[0-9]+e
@@ -110,19 +101,24 @@ class TorrentParser(object):
             if self.next_char() != TorrentParser.INT_START:
                 raise ParsingError('Error while parsing for an integer. Found %s at position %d while %s is expected.' %
                                    (self.curr_char, self.torr_str.pos, TorrentParser.INT_START))
-            
+                            
+            return self._parse_number(delimiter=self.INT_END)
+        
+        def _parse_number(self, delimiter):
+            ''' Parses a sequence of digits representing either an integer or string length and returns the number. '''
             parsed_int = ''
             while True:
                 parsed_int_char = self.next_char()
                 if parsed_int_char not in string.digits:
-                    if parsed_int_char != self.INT_END:
+                    if parsed_int_char != delimiter:
                         raise ParsingError('Invalid character %s found after parsing an integer (%s expected) at position %d.' % 
-                                           (parsed_int_char, self.INT_END, self.torr_str.pos))                     
-                    break
+                                           (parsed_int_char, delimiter, self.torr_str.pos))
+                    else:                                          
+                        break
                 
                 parsed_int += parsed_int_char
                 
-            return int(parsed_int)    
+            return int(parsed_int)
        
 
     def __init__(self, torrent_file_path):
@@ -156,11 +152,21 @@ class TorrentParser(object):
         return self.parsed_content.get('announce')
 
     
-    def get_creation_date(self):
-        ''' Returns creation date of the torrent, if present, in ISO format from the parsed torrent file. '''
+    def get_creation_date(self, time_format='iso'):
+        ''' Returns creation date of the torrent, if present, in ISO time_format from the parsed torrent file.
+            
+            Args:
+                time_format - determines the time_format of the time value returned. Valid values 'iso' or 'datetime'.
+                         Defaults to 'iso'.        
+        '''
         time_stamp = self.parsed_content.get('creation date')
         if time_stamp:
-            return datetime.utcfromtimestamp(time_stamp).isoformat()         
+            time_stamp = datetime.utcfromtimestamp(time_stamp)
+            
+            if time_format == 'iso':
+                return time_stamp.isoformat()
+            else:
+                return time_stamp
             
     
     def get_client_name(self):
@@ -229,7 +235,7 @@ class TorrentParser(object):
             return parsed_list                
         
         
-if __name__ == '__main__': #eventhough this is intended to be a library, this is helpful when debugging
+if __name__ == '__main__': # this is helpful when debugging
         
     test_files = ['test_data/Elephants Dream (avi) (1024x576).torrent', # single file torrent
                   'test_data/Megan Lisa Jones - Captive BitTorrent Edition.torrent', # multi-file torrent

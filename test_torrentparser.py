@@ -15,11 +15,7 @@ from torrentparser import TorrentParser
 from test_data.data_torrents_info import TORRENTS_INFO
 
 class TestTorrentParse(unittest.TestCase):
-    ''' Unit tests for TorrentParser. Uses meta-data stored in data_torrents_info in data director to verify.
-     
-        TODO:
-            . Handle file path with multiple strings, due to difference in the format returned by the api 
-                (joined by os.path.sep) and the format in the data file (as separate strings).    
+    ''' Unit tests for TorrentParser. Uses meta-data stored in data_torrents_info in data director to verify.     
     '''
 
     def test_parsercreation_invalidtype_file_input(self):

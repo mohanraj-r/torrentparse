@@ -8,6 +8,8 @@ Created on 2012-03-07
 @author: mohanr
 '''
 
+from os.path import sep
+
 TORRENTS_INFO = {
     'Elephants Dream (avi) (1024x576).torrent': { # name of torrent file as in the file system
         'tracker_url': 'http://jip.cs.vu.nl:6969/announce',
@@ -21,7 +23,7 @@ TORRENTS_INFO = {
         'creation_date': 1327345573,
         'client_name': None,         
         'file_details': (('An.Honest.Man.720p.x264-VODO.mkv', 1436161730,),
-                         (('Sample', 'An.Honest.Man.720p.x264.Sample-VODO.mkv'), 31546414,),
+                         ('Sample' + sep + 'An.Honest.Man.720p.x264.Sample-VODO.mkv', 31546414,),
                          ('Show.your.support.now!.URL', 137,),
                          ('vodo.nfo', 6142,),
                          ),                                                                     
