@@ -1,6 +1,7 @@
 What
 ====
-Parse a torrent file and provide methods to access the following attributes 
+Parse a torrent file (bdecode) in Python without any 3rd party libraries and provide methods to access the following attributes 
+
 * tracker url, 
 * creation date,
 * name of the client that created the torrent, and
@@ -14,6 +15,7 @@ I was asked to write this as part of an interview process.
 How
 ===
 Resources that I used to understand Torrent file structure:
+
 * http://fileformats.wikia.com/wiki/Torrent_file
 * http://wiki.theory.org/BitTorrentSpecification
 * http://en.wikipedia.org/wiki/Bencode
