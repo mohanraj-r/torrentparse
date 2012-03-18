@@ -13,7 +13,7 @@ I was asked to write this as part of an interview process.
 
 How
 ===
-Resources that I used to understand Torrent file structure:
+Resources that I used to understand Torrent file structure
 * http://fileformats.wikia.com/wiki/Torrent_file
 * http://wiki.theory.org/BitTorrentSpecification
 * http://en.wikipedia.org/wiki/Bencode
@@ -25,8 +25,12 @@ The following stream of characters in the torrent file
 > "d8:announce33:http://jip.cs.vu.nl:6969/announce13:creation datei1147934820e4:infod6:lengthi445866736e4:name24:Elephants_Dream_1024.avi12:piece lengthi262144e6:pieces34020:"
 
 is transformed into
-> {'creation date': 1147934820, 'announce': 'http://jip.cs.vu.nl:6969/announce', 'info': {'length': 44
-5866736, 'piece length': 262144, 'name': 'Elephants_Dream_1024.avi', 'pieces':
+> { 'creation date': 1147934820, 
+>   'announce': 'http://jip.cs.vu.nl:6969/announce', 
+>   'info': { 'length': 445866736, 
+>             'piece length': 262144, 
+>             'name': 'Elephants_Dream_1024.avi', 
+>             'pieces':
 
 Existing implementations
 ========================
