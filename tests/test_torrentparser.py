@@ -11,7 +11,7 @@ TODOs:
 from datetime import datetime
 import unittest
 
-from torrentparser import TorrentParser
+from torrentparse import TorrentParser
 from test_data.data_torrents_info import TORRENTS_INFO
 
 class TestTorrentParse(unittest.TestCase):

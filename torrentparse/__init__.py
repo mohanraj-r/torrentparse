@@ -1,1 +1,3 @@
-__all__ = ['torrentparser']
+__all__ = ['torrentparse']
+
+from torrentparse import *
