@@ -140,8 +140,10 @@ class TorrentParser(object):
         if not os.path.exists(torrent_file_path):
             raise IOError("No file found at '%s'" % torrent_file_path)
         
-        self.torrent_file = open(torrent_file_path)
-        self.torrent_content = self.torrent_file.read()
+        #self.torrent_file = open(torrent_file_path)
+        with open(torrent_file_path) as f:
+            self.torrent_content = f.read()
+
         self.torrent_str = self._TorrentStr(self.torrent_content)
         
         self.parsed_content = self._parse_torrent()
